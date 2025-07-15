@@ -2,6 +2,8 @@
 A rudimentary program to fine-tune an LLM with the goal of generating lyrics based on an input text file.
 
 ## Installation
+If using CUDA, navigate to https://developer.nvidia.com/cuda-downloads, and install based on the provided instructions.
+
 Recommended using Python 3.10, install all requirements with:
 ```bash
 pip install .

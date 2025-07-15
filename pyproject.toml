@@ -8,18 +8,18 @@ description = "A tool to fine-tune an LLM and generate songs from a text file."
 readme = "README.md"
 requires-python = ">=3.10"
 
-# This is for Apple Silicon (macOS). For NVIDIA, add 'bitsandbytes'.
 dependencies = [
-    "torch",
-    "torchvision",
-    "torchaudio",
+    "torch; sys_platform == 'darwin'",
+    "torchvision; sys_platform == 'darwin'",
+    "torchaudio; sys_platform == 'darwin'",
     "transformers",
     "accelerate",
     "datasets",
     "ftfy",
     "nltk",
     "pyyaml",
-    "sentencepiece"
+    "sentencepiece",
+    "bitsandbytes; sys_platform != 'darwin'" # bitsandbytes not compatible with macOS
 ]
 
 [project.scripts]

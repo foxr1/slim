@@ -33,7 +33,6 @@ def load_config(path='config.yaml'):
             return yaml.safe_load(f)
     else:
         print(f"Error: Configuration file not found at '{path}'.")
-        print("Please create a 'config.yaml' file in the same directory.")
         sys.exit(1)
 
 
@@ -47,6 +46,18 @@ def check_dependencies(config):
             print("Error: The selected T5 model requires the 'sentencepiece' library.")
             print("Please install it by running: pip install sentencepiece")
             sys.exit(1)
+
+    current_os = platform.system().lower()
+    config_os = config.get("operating_system", "auto").lower()
+    use_nvidia_optim = (config_os == "auto" and current_os in ["windows", "linux"]) or (
+                config_os in ["windows", "linux"])
+
+    if use_nvidia_optim:
+        try:
+            import bitsandbytes
+        except ImportError:
+            print("Warning: For optimal performance on NVIDIA GPUs, install the 'bitsandbytes' library.")
+            print("You can do so by running: pip install bitsandbytes")
 
 
 # --- 2. DATA PREPARATION PIPELINE ---
@@ -95,9 +106,10 @@ def clean_and_prepare_sentences(file_paths, config):
         stripped_line = line.strip()
         if not stripped_line: continue
         stripped_line = re.sub(r'^\d{1,3}:\d{1,3}\s*', '', stripped_line)
+        stripped_line = re.sub(r'https?://\S+', '', stripped_line)
+        stripped_line = re.sub(r'…see more', '', stripped_line)
         if re.match(r'^The (First|Second|Third|Fourth|Fifth|Book|Gospel|Lamentations|Song) of', stripped_line): continue
         if re.match(r'^The Book of the Prophet', stripped_line): continue
-        if re.match(r'https?://\S+', stripped_line): continue
         if re.match(r'^BOOK\s+[IVXLC]+\s*\.?$', stripped_line, re.IGNORECASE): continue
         if stripped_line.isdigit(): continue
         if stripped_line.isupper() and len(stripped_line) < 40: continue
@@ -156,7 +168,6 @@ def prepare_datasets(config, file_paths, no_cache=False):
         print("--- No cache found or --no-cache used. Processing data from scratch. ---")
         clean_sentences = clean_and_prepare_sentences(file_paths, config)
 
-        # --- THE FIX IS HERE ---
         sanitized_output_path = os.path.join("sanitised_input", f"{sanitized_file_base}_sanitised.txt")
         save_cleaned_sentences(clean_sentences, sanitized_output_path)
 
