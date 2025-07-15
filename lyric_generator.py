@@ -106,6 +106,7 @@ def clean_and_prepare_sentences(file_paths, config):
         stripped_line = line.strip()
         if not stripped_line: continue
         stripped_line = re.sub(r'^\d{1,3}:\d{1,3}\s*', '', stripped_line)
+        stripped_line = re.sub(r'\d\n\d+:\d+:\d+,\d+ --> \d+:\d+:\d+,\d+', '', stripped_line)  # Removing subtitle timestamps
         stripped_line = re.sub(r'https?://\S+', '', stripped_line)
         stripped_line = re.sub(r'…see more', '', stripped_line)
         if re.match(r'^The (First|Second|Third|Fourth|Fifth|Book|Gospel|Lamentations|Song) of', stripped_line): continue
