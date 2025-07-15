@@ -1,0 +1,29 @@
+[project]
+name = "slim"
+authors = [
+    {name = "Oliver R. Fox", email= "ollie.fox5@gmail.com"}
+]
+version = "1.0.0"
+description = "A tool to fine-tune an LLM and generate songs from a text file."
+readme = "README.md"
+requires-python = ">=3.10"
+
+# This is for Apple Silicon (macOS). For NVIDIA, add 'bitsandbytes'.
+dependencies = [
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "transformers",
+    "accelerate",
+    "datasets",
+    "ftfy",
+    "nltk",
+    "pyyaml",
+    "sentencepiece"
+]
+
+[project.scripts]
+generate-lyrics = "lyric_generator:main"
+
+[tool.setuptools]
+py-modules = ["lyric_generator"]

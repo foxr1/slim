@@ -1,0 +1,35 @@
+operating_system: auto
+model_name: gpt2-medium # 'gpt2', 'gpt2-medium', 'google/flan-t5-small', 'distilbert/distilgpt2'
+cache_dir: cache
+quantise_script_path: ./extra/quantise_model.py
+
+# --- Text Preprocessing Settings ---
+min_words_per_sentence: 3
+max_words_per_sentence: 150
+
+song_structure:
+  - "[Verse 1]"
+  - "[Chorus]"
+  - "[Verse 2]"
+  - "[Chorus]"
+  - "[Bridge]"
+  - "[Chorus]"
+  - "[Outro]"
+tokens_per_section: 75
+ideal_words_per_line: 5  # Lyrical formatting
+
+# If true, injects [Verse] and [Chorus] tags into the training data
+inject_structure: false
+use_keyword_prompt: true
+prompt: "world"  # Only used if above is true, ignored if --random is used
+validation_set_size: 0.1
+save_song_to_file: true
+song_output_folder: "generated_songs"
+
+training_epochs: 3  # 3
+batch_size: 4  # 4
+learning_rate: 3e-5
+
+creativity_temperature: 0.7 # 0.85 - Lower is more predictable, higher is more creative.
+repetition_penalty: 1.25 # 1.25 - Penalizes the model for repeating words. Higher values encourage more novelty.
+
