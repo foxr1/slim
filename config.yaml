@@ -1,9 +1,15 @@
 operating_system: auto
-model_name: gpt2-medium # 'gpt2', 'gpt2-medium', 'google/flan-t5-small', 'distilbert/distilgpt2'
+# Decoder-Only (GPT-style):
+#   - gpt2-medium
+#   - distilbert/distilgpt2
+#   - facebook/opt-350m
+#   - TinyLlama/TinyLlama-1.1B-Chat-v1.0
+#   - Qwen/Qwen3-0.6B
+#   - deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
+model_name: deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B
 cache_dir: cache
 quantise_script_path: ./extra/quantise_model.py
 
-# --- Text Preprocessing Settings ---
 min_words_per_sentence: 3
 max_words_per_sentence: 150
 
@@ -18,8 +24,7 @@ song_structure:
 tokens_per_section: 75
 ideal_words_per_line: 5  # Lyrical formatting
 
-# If true, injects [Verse] and [Chorus] tags into the training data
-inject_structure: false
+inject_structure: false  # If true, injects [Verse] and [Chorus] tags into the training data
 use_keyword_prompt: true
 prompt: "world"  # Only used if above is true, ignored if --random is used
 validation_set_size: 0.1
@@ -29,6 +34,7 @@ song_output_folder: "generated_songs"
 training_epochs: 3  # 3
 batch_size: 4  # 4
 learning_rate: 3e-5
+gradient_accumulation_steps: 1
 
 creativity_temperature: 0.7 # 0.85 - Lower is more predictable, higher is more creative.
 repetition_penalty: 1.25 # 1.25 - Penalizes the model for repeating words. Higher values encourage more novelty.

@@ -19,7 +19,9 @@ dependencies = [
     "nltk",
     "pyyaml",
     "sentencepiece",
-    "bitsandbytes; sys_platform != 'darwin'" # bitsandbytes not compatible with macOS
+    "bitsandbytes; sys_platform != 'darwin'", # bitsandbytes not compatible with macOS
+    "protobuf",
+    "tqdm"
 ]
 
 [project.scripts]
