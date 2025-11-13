@@ -14,7 +14,6 @@ def load_config(path='config.yaml'):
         logging.error(f"Configuration file not found at '{path}'.")
         sys.exit(1)
 
-
 def parse_arguments(config):
     parser = argparse.ArgumentParser(description="AI Lyric Generator: Fine-tune a model and generate lyrics.")
     parser.add_argument("input_path", type=str, help="Path to the input text file or a folder containing .txt files.")
@@ -26,10 +25,16 @@ def parse_arguments(config):
                         help="Use a completely random prompt instead of a keyword-based one.")
     parser.add_argument("--quantise", action="store_true",
                         help="Use a quantised model for generation, creating one if it doesn't exist.")
+    parser.add_argument("--no-progress-bar", action="store_true",
+                        help="Do not show the tqdm progress bar during training.")
 
     for key, value in config.items():
-        if isinstance(value, (int, float, str)):
-            parser.add_argument(f"--{key.replace('_', '-')}", type=type(value),
+        arg_name = f"--{key.replace('_', '-')}"
+        if isinstance(value, bool):
+            parser.add_argument(arg_name, type=lambda x: (str(x).lower() == 'true'),
+                                help=f"Overrides config value for '{key}' (e.g., --{key}=False)")
+        elif isinstance(value, (int, float, str)):
+            parser.add_argument(arg_name, type=type(value),
                                 help=f"Overrides config value for '{key}'")
 
     return parser.parse_args()

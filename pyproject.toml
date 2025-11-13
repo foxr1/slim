@@ -21,7 +21,8 @@ dependencies = [
     "sentencepiece",
     "bitsandbytes; sys_platform != 'darwin'", # bitsandbytes not compatible with macOS
     "protobuf",
-    "tqdm"
+    "tqdm",
+    "plotnine"
 ]
 
 [project.scripts]

@@ -12,6 +12,7 @@ quantise_script_path: ./extra/quantise_model.py
 
 min_words_per_sentence: 3
 max_words_per_sentence: 150
+sanitise: true
 
 song_structure:
   - "[Verse 1]"
@@ -37,5 +38,4 @@ learning_rate: 3e-5
 gradient_accumulation_steps: 1
 
 creativity_temperature: 0.7 # 0.85 - Lower is more predictable, higher is more creative.
-repetition_penalty: 1.25 # 1.25 - Penalizes the model for repeating words. Higher values encourage more novelty.
-
+repetition_penalty: 1.25 # 1.25 - Penalises the model for repeating words. Higher values encourage more novelty.

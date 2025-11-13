@@ -20,11 +20,11 @@ from transformers import (
 
 class LyricModel:
     def __init__(self, config):
-        logging.info("Initializing LyricModel...")
+        logging.info("Initialising LyricModel...")
         self.config = config
         self.model_name = config['model_name']
         self.device = self._get_device()
-        self.tokenizer = None
+        self.tokeniser = None
         self.model = None
         self._check_dependencies()
 
@@ -51,13 +51,13 @@ class LyricModel:
                 logging.warning("For optimal performance on NVIDIA GPUs, install the 'bitsandbytes' library.")
                 logging.warning("You can do so by running: pip install bitsandbytes")
 
-    def train(self, train_dataset, eval_dataset, tokenizer, data_collator):
+    def train(self, train_dataset, eval_dataset, tokeniser, data_collator):
         logging.info("=" * 50)
         logging.info("               MODEL TRAINING")
         logging.info("=" * 50)
 
         model = AutoModelForCausalLM.from_pretrained(self.model_name, trust_remote_code=True)
-        model.resize_token_embeddings(len(tokenizer))
+        model.resize_token_embeddings(len(tokeniser))
 
         steps_per_epoch = len(train_dataset) // self.config['batch_size']
         if steps_per_epoch == 0:
@@ -78,17 +78,18 @@ class LyricModel:
             'learning_rate': self.config['learning_rate'],
             'gradient_accumulation_steps': self.config['gradient_accumulation_steps'],
             'torch_compile': False,
-            'prediction_loss_only': True
+            'prediction_loss_only': True,
+            'disable_tqdm': self.config.get('no_progress_bar', False)
         }
 
         if use_nvidia_optim and torch.cuda.is_available():
-            logging.info("Applying NVIDIA-specific optimizations (fp16, bitsandbytes)")
+            logging.info("Applying NVIDIA-specific optimisations (fp16, bitsandbytes)")
             args_dict.update({'fp16': True, 'optim': "adamw_bnb_8bit"})
         elif self.device.type == 'mps':
-            logging.info("Applying Apple MPS optimizations")
+            logging.info("Applying Apple MPS optimisations")
             args_dict.update({'fp16': False, 'dataloader_pin_memory': False})
         else:
-            logging.info("Using standard CPU optimizations")
+            logging.info("Using standard CPU optimisations")
             args_dict.update({'fp16': False, 'dataloader_pin_memory': False})
 
         training_args = TrainingArguments(**args_dict)
@@ -101,7 +102,7 @@ class LyricModel:
 
         logging.info(f"Saving the final model to {self.config['output_dir']}")
         trainer.save_model()
-        tokenizer.save_pretrained(self.config['output_dir'])
+        tokeniser.save_pretrained(self.config['output_dir'])
 
     def _get_initial_prompt(self, file_path, use_random=False):
         try:
@@ -143,12 +144,12 @@ class LyricModel:
             temp = base_temp + (0.1 * attempt)
             top_k = 50 + (10 * attempt)
 
-            input_ids = self.tokenizer.encode(prompt_text, return_tensors='pt').to(self.device)
+            input_ids = self.tokeniser.encode(prompt_text, return_tensors='pt').to(self.device)
 
-            if self.tokenizer.pad_token_id is None:
-                gen_pad_token_id = self.tokenizer.eos_token_id
+            if self.tokeniser.pad_token_id is None:
+                gen_pad_token_id = self.tokeniser.eos_token_id
             else:
-                gen_pad_token_id = self.tokenizer.pad_token_id
+                gen_pad_token_id = self.tokeniser.pad_token_id
 
             max_len = len(input_ids[0]) + self.config['tokens_per_section']
 
@@ -163,7 +164,7 @@ class LyricModel:
                 repetition_penalty=self.config['repetition_penalty']
             )
 
-            newly_generated_text = self.tokenizer.decode(output_sequences[0], skip_special_tokens=True).strip()
+            newly_generated_text = self.tokeniser.decode(output_sequences[0], skip_special_tokens=True).strip()
             newly_generated_text = newly_generated_text[len(prompt_text):].strip()
 
             if len(newly_generated_text.split()) > 2:
@@ -200,8 +201,8 @@ class LyricModel:
         return "\n".join(lyrical_lines)
 
     def _load_model_for_generation(self, use_quantised=False):
-        if self.model and self.tokenizer:
-            logging.info("Model and tokenizer already loaded.")
+        if self.model and self.tokeniser:
+            logging.info("Model and tokeniser already loaded.")
             return
 
         if use_quantised and self.device.type == 'mps':
@@ -217,9 +218,9 @@ class LyricModel:
                 f"Model directory not found at '{model_dir_to_load}'. Please train or quantise the model first.")
             sys.exit(1)
 
-        self.tokenizer = AutoTokenizer.from_pretrained(model_dir_to_load, trust_remote_code=True)
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token
+        self.tokeniser = AutoTokenizer.from_pretrained(model_dir_to_load, trust_remote_code=True)
+        if self.tokeniser.pad_token is None:
+            self.tokeniser.pad_token = self.tokeniser.eos_token
 
         if use_quantised:
             logging.info("Loading QUANTISED model")

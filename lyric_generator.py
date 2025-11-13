@@ -18,9 +18,7 @@ def main():
         config = load_config()
         args = parse_arguments(config)
 
-        for key, value in vars(args).items():
-            if value is not None and key in config:
-                config[key] = value
+        config.update({k: v for k, v in vars(args).items() if v is not None})
 
         config['learning_rate'] = float(config['learning_rate'])
 
@@ -53,8 +51,8 @@ def main():
             if model_exists and args.force_retrain:
                 logging.info(f"--force-retrain flag used. Re-training model")
 
-            train_dataset, eval_dataset, tokenizer, data_collator = pipeline.prepare_datasets(file_paths, no_cache=args.no_cache)
-            model_manager.train(train_dataset, eval_dataset, tokenizer, data_collator)
+            train_dataset, eval_dataset, tokeniser, data_collator = pipeline.prepare_datasets(file_paths, no_cache=args.no_cache)
+            model_manager.train(train_dataset, eval_dataset, tokeniser, data_collator)
         else:
             logging.info(f"Found existing model at '{config['output_dir']}'. Skipping training")
             logging.info("    (Use the --force-retrain flag to train again from scratch.)")
