@@ -255,8 +255,7 @@ class LyricModel:
                     break
                 i += 1
 
-            keys_to_save = ['model_name', 'tokens_per_section', 'ideal_words_per_line', 'creativity_temperature',
-                            'learning_rate']
+            keys_to_save = ['model_name', 'training_epochs', 'batch_size', 'gradient_accumulation_steps', 'learning_rate', 'tokens_per_section', 'ideal_words_per_line', 'creativity_temperature', 'repetition_penalty', 'sanitise']
             config_string = "\n".join([f"{key}: {self.config[key]}" for key in keys_to_save if key in self.config])
 
             file_content = f"Generation Parameters\n{config_string}\n{'-' * 40}\nStarting song with initial idea: '{initial_idea}'\n{'-' * 40}\n\n{song_text}"

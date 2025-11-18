@@ -100,7 +100,7 @@ class DataPipeline:
         for sentence in sentences:
             word_count = len(sentence.split())
             if self.config['min_words_per_sentence'] <= word_count <= self.config['max_words_per_sentence']:
-                cleaned_sentences.append(sentence.strip().capitalize())
+                cleaned_sentences.append(sentence.strip())
 
         logging.info(f"Step 7/7: Preprocessing complete. Found {len(cleaned_sentences)} high-quality sentences.")
         return cleaned_sentences
@@ -117,12 +117,13 @@ class DataPipeline:
 
     def prepare_datasets(self, file_paths, no_cache=False):
         model_type_str = "decoder"
+        sanitise_str = "sanitised" if self.config.get('sanitise', True) else "unsanitised"
 
         cache_dir = self.config['cache_dir']
         os.makedirs(cache_dir, exist_ok=True)
 
         sanitised_file_base = os.path.basename(self.config['output_dir'])
-        cache_file = os.path.join(cache_dir, f"{sanitised_file_base}_{model_type_str}_tokenised.pkl")
+        cache_file = os.path.join(cache_dir, f"{sanitised_file_base}_{model_type_str}_{sanitise_str}_tokenised.pkl")
 
         if not no_cache and os.path.exists(cache_file):
             logging.info(f"Loading cached tokenised datasets from '{cache_file}'")
